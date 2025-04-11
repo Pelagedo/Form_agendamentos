@@ -1,25 +1,17 @@
 import streamlit as st
 
-# Lista de municípios do estado do Rio de Janeiro
-municipios_rj = [
-    "Angra dos Reis", "Aperibé", "Araruama", "Areal", "Armação dos Búzios", "Arraial do Cabo", 
-    "Barra do Piraí", "Barra Mansa", "Belford Roxo", "Bom Jardim", "Bom Jesus do Itabapoana", 
-    "Cabo Frio", "Cachoeiras de Macacu", "Cambuci", "Campos dos Goytacazes", "Cantagalo", 
-    "Carapebus", "Cardoso Moreira", "Carmo", "Casimiro de Abreu", "Comendador Levy Gasparian", 
-    "Conceição de Macabu", "Cordeiro", "Duas Barras", "Duque de Caxias", "Engenheiro Paulo de Frontin", 
-    "Guapimirim", "Iguaba Grande", "Itaboraí", "Itaguaí", "Italva", "Itaocara", "Itaperuna", 
-    "Itatiaia", "Japeri", "Laje do Muriaé", "Macaé", "Macuco", "Magé", "Mangaratiba", "Maricá", 
-    "Mendes", "Mesquita", "Miguel Pereira", "Miracema", "Natividade", "Nilópolis", "Niterói", 
-    "Nova Friburgo", "Nova Iguaçu", "Paracambi", "Paraíba do Sul", "Paraty", "Paty do Alferes", 
-    "Petrópolis", "Pinheiral", "Piraí", "Porciúncula", "Porto Real", "Quatis", "Queimados", 
-    "Quissamã", "Resende", "Rio Bonito", "Rio Claro", "Rio das Flores", "Rio das Ostras", 
-    "Rio de Janeiro", "Santa Maria Madalena", "Santo Antônio de Pádua", "São Fidélis", 
-    "São Francisco de Itabapoana", "São Gonçalo", "São João da Barra", "São João de Meriti", 
-    "São José de Ubá", "São José do Vale do Rio Preto", "São Pedro da Aldeia", "São Sebastião do Alto", 
-    "Sapucaia", "Saquarema", "Seropédica", "Silva Jardim", "Sumidouro", "Tanguá", 
-    "Teresópolis", "Trajano de Moraes", "Três Rios", "Valença", "Varre-Sai", "Vassouras", 
-    "Volta Redonda"
-]
+# Dicionário contendo os municípios do RJ e seus respectivos bairros
+municipios_bairros = {
+    "Rio de Janeiro": ["Botafogo", "Copacabana", "Ipanema", "Leblon", "Tijuca", "Barra da Tijuca"],
+    "Niterói": ["Icaraí", "Santa Rosa", "Ingá", "Centro", "São Francisco"],
+    "São Gonçalo": ["Alcântara", "Neves", "Centro", "Trindade", "Colubandê"],
+    "Duque de Caxias": ["Centro", "Jardim Gramacho", "Parque Lafaiete", "Pilar", "Saracuruna"],
+    "Nova Iguaçu": ["Centro", "Austin", "Comendador Soares", "Vila de Cava", "Posse"],
+    # Adicione outros municípios e bairros aqui
+}
+
+# Lista de municípios
+municipios_rj = list(municipios_bairros.keys())
 
 # Título do Formulário
 st.title("Formulário de Agendamento de Veículos")
@@ -36,7 +28,7 @@ orgao_logado = st.text_input("Órgão Usuário Logado")
 # Campos de Partida
 st.header("Dados da Partida")
 municipio_partida = st.selectbox("Município de Partida", municipios_rj)
-bairro_partida = st.text_input("Bairro de Partida")
+bairro_partida = st.selectbox("Bairro de Partida", municipios_bairros.get(municipio_partida, []))
 rua_partida = st.text_input("Rua (Endereço de Partida)")
 numero_partida = st.text_input("Número (Endereço de Partida)")
 
@@ -47,7 +39,7 @@ destinos = []
 for i in range(numero_destinos):
     st.subheader(f"Destino {i + 1}")
     municipio_destino = st.selectbox(f"Município de Destino {i + 1}", municipios_rj, key=f"municipio_destino_{i}")
-    bairro_destino = st.text_input(f"Bairro de Destino {i + 1}", key=f"bairro_destino_{i}")
+    bairro_destino = st.selectbox(f"Bairro de Destino {i + 1}", municipios_bairros.get(municipio_destino, []), key=f"bairro_destino_{i}")
     rua_destino = st.text_input(f"Rua (Endereço de Destino {i + 1})", key=f"rua_destino_{i}")
     numero_destino = st.text_input(f"Número (Endereço de Destino {i + 1})", key=f"numero_destino_{i}")
     destinos.append({
