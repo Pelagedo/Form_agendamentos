@@ -5,7 +5,56 @@ import sqlite3
 def conectar_banco():
     return sqlite3.connect('agendamento.db')
 
-# Função para buscar todos os registros do banco
+# Função para criar a tabela no banco de dados
+def criar_tabela():
+    conn = conectar_banco()
+    cursor = conn.cursor()
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS agendamentos (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            matricula TEXT,
+            nome TEXT,
+            telefone TEXT,
+            email_logado TEXT,
+            email_solicitante TEXT,
+            orgao_logado TEXT,
+            municipio_partida TEXT,
+            bairro_partida TEXT,
+            rua_partida TEXT,
+            numero_partida TEXT,
+            municipio_destino TEXT,
+            bairro_destino TEXT,
+            rua_destino TEXT,
+            numero_destino TEXT,
+            existe_pernoite TEXT,
+            qtd_pernoite INTEGER,
+            data_retorno TEXT,
+            tipo_veiculo TEXT,
+            nome_responsavel TEXT,
+            matricula_responsavel TEXT,
+            email_responsavel TEXT
+        )
+    ''')
+    conn.commit()
+    conn.close()
+
+# Função para salvar os dados no banco
+def salvar_dados(dados):
+    conn = conectar_banco()
+    cursor = conn.cursor()
+    cursor.execute('''
+        INSERT INTO agendamentos (
+            matricula, nome, telefone, email_logado, email_solicitante, orgao_logado,
+            municipio_partida, bairro_partida, rua_partida, numero_partida,
+            municipio_destino, bairro_destino, rua_destino, numero_destino,
+            existe_pernoite, qtd_pernoite, data_retorno, tipo_veiculo,
+            nome_responsavel, matricula_responsavel, email_responsavel
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    ''', dados)
+    conn.commit()
+    conn.close()
+
+# Função para buscar dados do banco
 def buscar_dados():
     conn = conectar_banco()
     cursor = conn.cursor()
@@ -14,7 +63,7 @@ def buscar_dados():
     conn.close()
     return dados
 
-# Função para atualizar um campo específico no banco de dados
+# Função para atualizar dados no banco
 def atualizar_dados(id, campo, novo_valor):
     conn = conectar_banco()
     cursor = conn.cursor()
@@ -28,7 +77,6 @@ def exibir_dados():
     dados = buscar_dados()
     if dados:
         st.write("### Registros Salvos")
-        st.write("Abaixo estão os registros salvos no banco de dados:")
         colunas = [
             "ID", "Matrícula", "Nome", "Telefone", "Email Logado", "Email Solicitante",
             "Órgão", "Município Partida", "Bairro Partida", "Rua Partida", "Número Partida",
@@ -71,25 +119,65 @@ def editar_dados():
     else:
         st.warning("Nenhum registro encontrado no banco de dados.")
 
+# Função para exibir o formulário
+def exibir_formulario():
+    st.write("### Enviar Novo Formulário")
+    matricula = st.text_input("Matrícula do Solicitante")
+    nome = st.text_input("Nome do Solicitante")
+    telefone = st.text_input("Telefone do Solicitante")
+    email_logado = st.text_input("E-mail Logado (Office)")
+    email_solicitante = st.text_input("E-mail do Solicitante")
+    orgao_logado = st.text_input("Órgão Usuário Logado")
+
+    municipio_partida = st.text_input("Município de Partida")
+    bairro_partida = st.text_input("Bairro de Partida")
+    rua_partida = st.text_input("Rua (Endereço de Partida)")
+    numero_partida = st.text_input("Número (Endereço de Partida)")
+
+    municipio_destino = st.text_input("Município de Destino")
+    bairro_destino = st.text_input("Bairro de Destino")
+    rua_destino = st.text_input("Rua (Endereço de Destino)")
+    numero_destino = st.text_input("Número (Endereço de Destino)")
+
+    existe_pernoite = st.selectbox("Existe Pernoite?", ["Sim", "Não"])
+    qtd_pernoite = st.number_input("Quantidade de Pernoites", min_value=0, step=1)
+    data_retorno = st.date_input("Data de Retorno do Pernoite")
+    tipo_veiculo = st.text_input("Tipo de Veículo")
+
+    nome_responsavel = st.text_input("Nome do Responsável")
+    matricula_responsavel = st.text_input("Matrícula do Responsável")
+    email_responsavel = st.text_input("E-mail do Responsável")
+
+    if st.button("Enviar"):
+        if not matricula or not nome or not telefone or not email_logado or not municipio_partida:
+            st.error("Por favor, preencha todos os campos obrigatórios!")
+        else:
+            dados = (
+                matricula, nome, telefone, email_logado, email_solicitante, orgao_logado,
+                municipio_partida, bairro_partida, rua_partida, numero_partida,
+                municipio_destino, bairro_destino, rua_destino, numero_destino,
+                existe_pernoite, qtd_pernoite, str(data_retorno), tipo_veiculo,
+                nome_responsavel, matricula_responsavel, email_responsavel
+            )
+            salvar_dados(dados)
+            st.success("Formulário enviado com sucesso e salvo no banco de dados!")
+
 # Função principal para o menu
 def main():
-    st.title("Menu de Consulta e Edição de Dados")
+    criar_tabela()
 
-    # Menu lateral
+    st.title("Sistema de Gerenciamento de Agendamentos")
+
     menu = st.sidebar.radio("Menu", ["Consultar Dados", "Editar Dados", "Enviar Novo Formulário"])
 
     if menu == "Consultar Dados":
-        st.subheader("Consultar Dados")
         exibir_dados()
 
     elif menu == "Editar Dados":
-        st.subheader("Editar Dados")
         editar_dados()
 
     elif menu == "Enviar Novo Formulário":
-        st.subheader("Enviar Novo Formulário")
-        # Aqui você pode reutilizar o código do formulário original
-        st.write("Formulário será implementado aqui.")
+        exibir_formulario()
 
 # Executa o app
 if __name__ == "__main__":
