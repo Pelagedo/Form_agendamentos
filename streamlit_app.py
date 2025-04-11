@@ -8,9 +8,8 @@ st.header("Dados do Solicitante")
 matricula = st.text_input("Matrícula do Solicitante")
 nome = st.text_input("Nome do Solicitante")
 telefone = st.text_input("Telefone do Solicitante")
-email_logado = st.text_input("E-mail Logado (Office)")
 email_solicitante = st.text_input("E-mail do Solicitante")
-orgao_logado = st.text_input("Órgão Usuário Logado")
+orgao_solicitante = st.text_input("Órgão solicitante")
 
 # Dados da Partida
 st.header("Dados da Partida")
