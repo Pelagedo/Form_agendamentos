@@ -24,6 +24,17 @@ municipios_rj = [
 # Título do Formulário
 st.title("Formulário de Agendamento de Veículos")
 
+# Sidebar para consulta de dados
+st.sidebar.title("Opções")
+consulta = st.sidebar.checkbox("Consultar Dados Preenchidos")
+
+if consulta:
+    st.sidebar.write("### Dados Preenchidos:")
+    if "form_data" in st.session_state:
+        st.sidebar.json(st.session_state["form_data"])
+    else:
+        st.sidebar.write("Nenhum dado preenchido ainda.")
+
 # Campos do Solicitante
 st.header("Dados do Solicitante")
 matricula = st.text_input("Matrícula do Solicitante")
@@ -78,8 +89,7 @@ if st.button("Enviar"):
     else:
         # Exibe os dados inseridos (simula o envio)
         st.success("Formulário enviado com sucesso!")
-        st.write("### Dados do Formulário:")
-        st.json({
+        form_data = {
             "Solicitante": {
                 "Matrícula": matricula,
                 "Nome": nome,
@@ -106,4 +116,9 @@ if st.button("Enviar"):
                 "Matrícula": matricula_responsavel,
                 "E-mail": email_responsavel
             }
-        })
+        }
+        st.write("### Dados do Formulário:")
+        st.json(form_data)
+        
+        # Salva os dados na sessão para consulta
+        st.session_state["form_data"] = form_data
