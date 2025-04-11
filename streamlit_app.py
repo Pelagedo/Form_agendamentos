@@ -19,7 +19,6 @@ def criar_tabela():
             email_solicitante TEXT,
             orgao_logado TEXT,
             municipio_partida TEXT,
-            bairro_partida TEXT,
             rua_partida TEXT,
             numero_partida TEXT,
             destinos TEXT,
@@ -42,24 +41,34 @@ def salvar_dados(dados):
     cursor.execute('''
         INSERT INTO agendamentos (
             matricula, nome, telefone, email_logado, email_solicitante, orgao_logado,
-            municipio_partida, bairro_partida, rua_partida, numero_partida,
-            destinos, existe_pernoite, qtd_pernoite, data_retorno, tipo_veiculo,
-            nome_responsavel, matricula_responsavel, email_responsavel
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            municipio_partida, rua_partida, numero_partida, destinos, existe_pernoite,
+            qtd_pernoite, data_retorno, tipo_veiculo, nome_responsavel, matricula_responsavel,
+            email_responsavel
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     ''', dados)
     conn.commit()
     conn.close()
 
-# Dicionário de municípios e bairros (simplificado; adicione mais conforme necessário)
-municipios_bairros = {
-    "Rio de Janeiro": ["Botafogo", "Copacabana", "Ipanema", "Tijuca"],
-    "Niterói": ["Icaraí", "Santa Rosa", "Ingá"],
-    "Duque de Caxias": ["Centro", "Jardim Gramacho", "Saracuruna"],
-    # Adicione outros municípios e bairros aqui
-}
-
-# Lista de municípios
-municipios_rj = list(municipios_bairros.keys())
+# Lista de municípios do estado do Rio de Janeiro
+municipios_rj = [
+    "Angra dos Reis", "Aperibé", "Araruama", "Areal", "Armação dos Búzios", "Arraial do Cabo",
+    "Barra do Piraí", "Barra Mansa", "Belford Roxo", "Bom Jardim", "Bom Jesus do Itabapoana",
+    "Cabo Frio", "Cachoeiras de Macacu", "Cambuci", "Campos dos Goytacazes", "Cantagalo",
+    "Carapebus", "Cardoso Moreira", "Carmo", "Casimiro de Abreu", "Comendador Levy Gasparian",
+    "Conceição de Macabu", "Cordeiro", "Duas Barras", "Duque de Caxias", "Engenheiro Paulo de Frontin",
+    "Guapimirim", "Iguaba Grande", "Itaboraí", "Itaguaí", "Italva", "Itaocara", "Itaperuna",
+    "Itatiaia", "Japeri", "Laje do Muriaé", "Macaé", "Macuco", "Magé", "Mangaratiba", "Maricá",
+    "Mendes", "Mesquita", "Miguel Pereira", "Miracema", "Natividade", "Nilópolis", "Niterói",
+    "Nova Friburgo", "Nova Iguaçu", "Paracambi", "Paraíba do Sul", "Paraty", "Paty do Alferes",
+    "Petrópolis", "Pinheiral", "Piraí", "Porciúncula", "Porto Real", "Quatis", "Queimados",
+    "Quissamã", "Resende", "Rio Bonito", "Rio Claro", "Rio das Flores", "Rio das Ostras",
+    "Rio de Janeiro", "Santa Maria Madalena", "Santo Antônio de Pádua", "São Fidélis",
+    "São Francisco de Itabapoana", "São Gonçalo", "São João da Barra", "São João de Meriti",
+    "São José de Ubá", "São José do Vale do Rio Preto", "São Pedro da Aldeia", "São Sebastião do Alto",
+    "Sapucaia", "Saquarema", "Seropédica", "Silva Jardim", "Sumidouro", "Tanguá",
+    "Teresópolis", "Trajano de Moraes", "Três Rios", "Valença", "Varre-Sai", "Vassouras",
+    "Volta Redonda"
+]
 
 # Função para exibir o formulário
 def exibir_formulario():
@@ -73,7 +82,6 @@ def exibir_formulario():
     orgao_logado = st.text_input("Órgão Usuário Logado")
 
     municipio_partida = st.selectbox("Município de Partida", municipios_rj)
-    bairro_partida = st.selectbox("Bairro de Partida", municipios_bairros.get(municipio_partida, []))
     rua_partida = st.text_input("Rua (Endereço de Partida)")
     numero_partida = st.text_input("Número (Endereço de Partida)")
 
@@ -84,12 +92,10 @@ def exibir_formulario():
     for i in range(numero_destinos):
         st.subheader(f"Destino {i + 1}")
         municipio_destino = st.selectbox(f"Município de Destino {i + 1}", municipios_rj, key=f"municipio_destino_{i}")
-        bairro_destino = st.selectbox(f"Bairro de Destino {i + 1}", municipios_bairros.get(municipio_destino, []), key=f"bairro_destino_{i}")
         rua_destino = st.text_input(f"Rua (Endereço de Destino {i + 1})", key=f"rua_destino_{i}")
         numero_destino = st.text_input(f"Número (Endereço de Destino {i + 1})", key=f"numero_destino_{i}")
         destinos.append({
             "municipio": municipio_destino,
-            "bairro": bairro_destino,
             "rua": rua_destino,
             "numero": numero_destino
         })
@@ -111,9 +117,9 @@ def exibir_formulario():
             destinos_str = str(destinos)
             dados = (
                 matricula, nome, telefone, email_logado, email_solicitante, orgao_logado,
-                municipio_partida, bairro_partida, rua_partida, numero_partida,
-                destinos_str, existe_pernoite, qtd_pernoite, str(data_retorno), tipo_veiculo,
-                nome_responsavel, matricula_responsavel, email_responsavel
+                municipio_partida, rua_partida, numero_partida, destinos_str, existe_pernoite,
+                qtd_pernoite, str(data_retorno), tipo_veiculo, nome_responsavel, matricula_responsavel,
+                email_responsavel
             )
             salvar_dados(dados)
             st.success("Formulário enviado com sucesso e salvo no banco de dados!")
