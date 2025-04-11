@@ -2,11 +2,16 @@ import streamlit as st
 
 # Dicionário contendo os municípios do RJ e seus respectivos bairros
 municipios_bairros = {
-    "Rio de Janeiro": ["Botafogo", "Copacabana", "Ipanema", "Leblon", "Tijuca", "Barra da Tijuca"],
+    "Rio de Janeiro": ["Botafogo", "Copacabana", "Ipanema", "Leblon", "Tijuca", "Barra da Tijuca", "Bangu", "Campo Grande"],
     "Niterói": ["Icaraí", "Santa Rosa", "Ingá", "Centro", "São Francisco"],
     "São Gonçalo": ["Alcântara", "Neves", "Centro", "Trindade", "Colubandê"],
     "Duque de Caxias": ["Centro", "Jardim Gramacho", "Parque Lafaiete", "Pilar", "Saracuruna"],
     "Nova Iguaçu": ["Centro", "Austin", "Comendador Soares", "Vila de Cava", "Posse"],
+    "Petrópolis": ["Centro Histórico", "Quitandinha", "Bingen", "Itaipava", "Valparaíso"],
+    "Volta Redonda": ["Aterrado", "Vila Santa Cecília", "Retiro", "Siderlândia", "Jardim Amália"],
+    "Campos dos Goytacazes": ["Centro", "Guarus", "Parque Leopoldina", "Pelinca", "Jockey Club"],
+    "Macaé": ["Cavaleiros", "Centro", "Lagomar", "Imbetiba", "Glória"],
+    "Angra dos Reis": ["Centro", "Frade", "Jacuecanga", "Monsuaba", "Vila Velha"],
     # Adicione outros municípios e bairros aqui
 }
 
