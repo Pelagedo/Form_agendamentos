@@ -22,10 +22,7 @@ def criar_tabela():
             bairro_partida TEXT,
             rua_partida TEXT,
             numero_partida TEXT,
-            municipio_destino TEXT,
-            bairro_destino TEXT,
-            rua_destino TEXT,
-            numero_destino TEXT,
+            destinos TEXT,
             existe_pernoite TEXT,
             qtd_pernoite INTEGER,
             data_retorno TEXT,
@@ -46,78 +43,12 @@ def salvar_dados(dados):
         INSERT INTO agendamentos (
             matricula, nome, telefone, email_logado, email_solicitante, orgao_logado,
             municipio_partida, bairro_partida, rua_partida, numero_partida,
-            municipio_destino, bairro_destino, rua_destino, numero_destino,
-            existe_pernoite, qtd_pernoite, data_retorno, tipo_veiculo,
+            destinos, existe_pernoite, qtd_pernoite, data_retorno, tipo_veiculo,
             nome_responsavel, matricula_responsavel, email_responsavel
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     ''', dados)
     conn.commit()
     conn.close()
-
-# Função para buscar dados do banco
-def buscar_dados():
-    conn = conectar_banco()
-    cursor = conn.cursor()
-    cursor.execute("SELECT * FROM agendamentos")
-    dados = cursor.fetchall()
-    conn.close()
-    return dados
-
-# Função para atualizar dados no banco
-def atualizar_dados(id, campo, novo_valor):
-    conn = conectar_banco()
-    cursor = conn.cursor()
-    consulta = f"UPDATE agendamentos SET {campo} = ? WHERE id = ?"
-    cursor.execute(consulta, (novo_valor, id))
-    conn.commit()
-    conn.close()
-
-# Função para exibir os registros em formato de tabela
-def exibir_dados():
-    dados = buscar_dados()
-    if dados:
-        st.write("### Registros Salvos")
-        colunas = [
-            "ID", "Matrícula", "Nome", "Telefone", "Email Logado", "Email Solicitante",
-            "Órgão", "Município Partida", "Bairro Partida", "Rua Partida", "Número Partida",
-            "Município Destino", "Bairro Destino", "Rua Destino", "Número Destino",
-            "Existe Pernoite", "Qtd Pernoite", "Data Retorno", "Tipo Veículo",
-            "Nome Responsável", "Matrícula Responsável", "Email Responsável"
-        ]
-        st.dataframe(
-            [{col: valor for col, valor in zip(colunas, linha)} for linha in dados],
-            use_container_width=True
-        )
-    else:
-        st.warning("Nenhum registro encontrado no banco de dados.")
-
-# Função para editar um registro
-def editar_dados():
-    dados = buscar_dados()
-    if dados:
-        st.write("### Editar Registro")
-        ids = [linha[0] for linha in dados]
-        id_selecionado = st.selectbox("Selecione o ID do registro para editar", ids)
-
-        if id_selecionado:
-            registro = next((linha for linha in dados if linha[0] == id_selecionado), None)
-            if registro:
-                campo_selecionado = st.selectbox(
-                    "Selecione o campo para editar",
-                    [
-                        "matricula", "nome", "telefone", "email_logado", "email_solicitante",
-                        "orgao_logado", "municipio_partida", "bairro_partida", "rua_partida",
-                        "numero_partida", "municipio_destino", "bairro_destino", "rua_destino",
-                        "numero_destino", "existe_pernoite", "qtd_pernoite", "data_retorno",
-                        "tipo_veiculo", "nome_responsavel", "matricula_responsavel", "email_responsavel"
-                    ]
-                )
-                novo_valor = st.text_input(f"Novo valor para {campo_selecionado}")
-                if st.button("Salvar Alteração"):
-                    atualizar_dados(id_selecionado, campo_selecionado, novo_valor)
-                    st.success("Registro atualizado com sucesso!")
-    else:
-        st.warning("Nenhum registro encontrado no banco de dados.")
 
 # Dicionário de municípios e bairros (simplificado; adicione mais conforme necessário)
 municipios_bairros = {
@@ -146,10 +77,22 @@ def exibir_formulario():
     rua_partida = st.text_input("Rua (Endereço de Partida)")
     numero_partida = st.text_input("Número (Endereço de Partida)")
 
-    municipio_destino = st.selectbox("Município de Destino", municipios_rj)
-    bairro_destino = st.selectbox("Bairro de Destino", municipios_bairros.get(municipio_destino, []))
-    rua_destino = st.text_input("Rua (Endereço de Destino)")
-    numero_destino = st.text_input("Número (Endereço de Destino)")
+    # Adicionar vários destinos
+    st.write("### Destinos")
+    destinos = []
+    numero_destinos = st.number_input("Quantos destinos deseja adicionar?", min_value=1, max_value=10, step=1)
+    for i in range(numero_destinos):
+        st.subheader(f"Destino {i + 1}")
+        municipio_destino = st.selectbox(f"Município de Destino {i + 1}", municipios_rj, key=f"municipio_destino_{i}")
+        bairro_destino = st.selectbox(f"Bairro de Destino {i + 1}", municipios_bairros.get(municipio_destino, []), key=f"bairro_destino_{i}")
+        rua_destino = st.text_input(f"Rua (Endereço de Destino {i + 1})", key=f"rua_destino_{i}")
+        numero_destino = st.text_input(f"Número (Endereço de Destino {i + 1})", key=f"numero_destino_{i}")
+        destinos.append({
+            "municipio": municipio_destino,
+            "bairro": bairro_destino,
+            "rua": rua_destino,
+            "numero": numero_destino
+        })
 
     existe_pernoite = st.selectbox("Existe Pernoite?", ["Sim", "Não"])
     qtd_pernoite = st.number_input("Quantidade de Pernoites", min_value=0, step=1)
@@ -164,11 +107,12 @@ def exibir_formulario():
         if not matricula or not nome or not telefone or not email_logado or not municipio_partida:
             st.error("Por favor, preencha todos os campos obrigatórios!")
         else:
+            # Convertendo os destinos para string para salvar no banco
+            destinos_str = str(destinos)
             dados = (
                 matricula, nome, telefone, email_logado, email_solicitante, orgao_logado,
                 municipio_partida, bairro_partida, rua_partida, numero_partida,
-                municipio_destino, bairro_destino, rua_destino, numero_destino,
-                existe_pernoite, qtd_pernoite, str(data_retorno), tipo_veiculo,
+                destinos_str, existe_pernoite, qtd_pernoite, str(data_retorno), tipo_veiculo,
                 nome_responsavel, matricula_responsavel, email_responsavel
             )
             salvar_dados(dados)
@@ -183,7 +127,12 @@ def main():
     menu = st.sidebar.radio("Menu", ["Consultar Dados", "Editar Dados", "Enviar Novo Formulário"])
 
     if menu == "Consultar Dados":
-        exibir_dados()
+        dados = buscar_dados()
+        if dados:
+            st.write("### Registros Salvos")
+            st.write(dados)
+        else:
+            st.warning("Nenhum dado encontrado.")
 
     elif menu == "Editar Dados":
         editar_dados()
