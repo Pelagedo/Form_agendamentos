@@ -1,5 +1,5 @@
 import streamlit as st
-
+from datetime import datetime
 # Lista de municípios do estado do Rio de Janeiro
 municipios_rj = [
     "Angra dos Reis", "Aperibé", "Araruama", "Areal", "Armação dos Búzios", "Arraial do Cabo", 
@@ -72,8 +72,13 @@ for i in range(numero_destinos):
 st.header("Informações Adicionais")
 existe_pernoite = st.selectbox("Existe Pernoite?", ["Sim", "Não"])
 qtd_pernoite = st.number_input("Quantidade de Pernoites", min_value=0, step=1)
+
+# Entrada de data
 data_retorno = st.date_input("Data de Retorno do Pernoite")
-tipo_veiculo = st.text_input("Tipo de Veículo")
+
+# Converter a data para o formato brasileiro ao exibir
+data_retorno_formatada = data_retorno.strftime("%d/%m/%Y")
+st.write(f"Data de Retorno no formato brasileiro: {data_retorno_formatada}")
 
 # Dados do Responsável
 st.header("Dados do Responsável")
